@@ -1,0 +1,27 @@
+# Enable URL rewriting
+RewriteEngine On
+
+# Handle Angular and other front-end routes - remove this if not needed
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Redirect all requests to public/index.php
+RewriteRule ^(.*)$ public/index.php [QSA,L]
+
+# Optional: Redirect to HTTPS (uncomment if needed)
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Security: Deny access to sensitive files
+<Files "composer.json">
+    Require all denied
+</Files>
+<Files "composer.lock">
+    Require all denied
+</Files>
+<Files ".env">
+    Require all denied
+</Files>
+<FilesMatch "\.md$">
+    Require all denied
+</FilesMatch>

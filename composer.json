@@ -1,0 +1,17 @@
+{
+  "name": "reybi/mvc",
+  "description": "Basic MVC Template",
+  "type": "project",
+  "autoload": {
+    "psr-4": {
+      "Reybi\\MVC\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "reybitgo",
+      "email": "reybitgo@gmail.com"
+    }
+  ],
+  "require": {}
+}
