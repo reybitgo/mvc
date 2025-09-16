@@ -2,13 +2,13 @@
 
 // C:\laragon\www\mvc\src\controllers\ProfileController.php
 
-namespace Reybi\MVC\Controllers;
+namespace Gawis\MVC\Controllers;
 
-use Reybi\MVC\Models\User;
-use Reybi\MVC\Security\CSRFProtection;
-use Reybi\MVC\Security\InputValidator;
-use Reybi\MVC\Security\InputSanitizer;
-use Reybi\MVC\Security\RateLimiter;
+use Gawis\MVC\Models\User;
+use Gawis\MVC\Security\CSRFProtection;
+use Gawis\MVC\Security\InputValidator;
+use Gawis\MVC\Security\InputSanitizer;
+use Gawis\MVC\Security\RateLimiter;
 
 class ProfileController extends Controller
 {

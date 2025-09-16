@@ -2,7 +2,7 @@
 
 // C:\laragon\www\mvc\src\security\InputValidator.php
 
-namespace Reybi\MVC\Security;
+namespace Gawis\MVC\Security;
 
 class InputValidator
 {

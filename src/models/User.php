@@ -2,7 +2,7 @@
 
 // C:\laragon\www\mvc\src\models\User.php
 
-namespace Reybi\MVC\Models;
+namespace Gawis\MVC\Models;
 
 class User extends Model
 {

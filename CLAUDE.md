@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a PHP MVC (Model-View-Controller) authentication system with security features. The application uses PSR-4 autoloading with the namespace `Reybi\MVC` mapped to the `src/` directory.
+This is a PHP MVC (Model-View-Controller) authentication system with security features. The application uses PSR-4 autoloading with the namespace `Gawis\MVC` mapped to the `src/` directory.
 
 ## Architecture
 

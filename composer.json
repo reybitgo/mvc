@@ -1,10 +1,10 @@
 {
-  "name": "reybi/mvc",
+  "name": "gawis/mvc",
   "description": "Secure MVC Authentication System",
   "type": "project",
   "autoload": {
     "psr-4": {
-      "Reybi\\MVC\\": "src/"
+      "Gawis\\MVC\\": "src/"
     }
   },
   "authors": [

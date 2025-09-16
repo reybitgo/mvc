@@ -2,7 +2,7 @@
 
 // C:\laragon\www\mvc\src\controllers\Controller.php
 
-namespace Reybi\MVC\Controllers;
+namespace Gawis\MVC\Controllers;
 
 class Controller
 {

@@ -2,7 +2,7 @@
 
 // C:\laragon\www\mvc\src\security\CSRFProtection.php
 
-namespace Reybi\MVC\Security;
+namespace Gawis\MVC\Security;
 
 class CSRFProtection
 {

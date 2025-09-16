@@ -24,8 +24,8 @@ session_start();
 // Require composer autoloader
 require __DIR__ . '/../vendor/autoload.php';
 
-use Reybi\MVC\Controllers\UserController;
-use Reybi\MVC\Controllers\ProfileController;
+use Gawis\MVC\Controllers\UserController;
+use Gawis\MVC\Controllers\ProfileController;
 
 // Get the requested URL path
 $requestUri = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');

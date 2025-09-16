@@ -2,7 +2,7 @@
 
 // C:\laragon\www\mvc\src\models\Model.php
 
-namespace Reybi\MVC\Models;
+namespace Gawis\MVC\Models;
 
 use PDO;
 use PDOException;

@@ -2,7 +2,7 @@
 
 // C:\laragon\www\mvc\src\security\InputSanitizer.php
 
-namespace Reybi\MVC\Security;
+namespace Gawis\MVC\Security;
 
 class InputSanitizer
 {
