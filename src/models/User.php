@@ -110,4 +110,70 @@ class User extends Model
             return false;
         }
     }
+
+    public function updateEmail($id, $email)
+    {
+        try {
+            $pdo = self::getInstance()->getPdo();
+
+            // Check if email already exists for another user
+            $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ? AND id != ?");
+            $stmt->execute([$email, $id]);
+
+            if ($stmt->rowCount() > 0) {
+                return false; // Email already in use
+            }
+
+            // Update email
+            $stmt = $pdo->prepare("UPDATE users SET email = ? WHERE id = ?");
+            return $stmt->execute([$email, $id]);
+        } catch (\PDOException $e) {
+            error_log("Update email error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function verifyCurrentPassword($id, $password)
+    {
+        try {
+            $pdo = self::getInstance()->getPdo();
+
+            $stmt = $pdo->prepare("SELECT password_hash FROM users WHERE id = ? AND is_active = 1");
+            $stmt->execute([$id]);
+
+            $user = $stmt->fetch();
+
+            if ($user && password_verify($password, $user['password_hash'])) {
+                return true;
+            }
+
+            return false;
+        } catch (\PDOException $e) {
+            error_log("Verify password error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function getProfileData($id)
+    {
+        try {
+            $pdo = self::getInstance()->getPdo();
+
+            $stmt = $pdo->prepare("SELECT id, username, email, created_at FROM users WHERE id = ? AND is_active = 1");
+            $stmt->execute([$id]);
+
+            $user = $stmt->fetch();
+
+            if ($user) {
+                // Add additional profile information
+                $user['member_since'] = date('F Y', strtotime($user['created_at']));
+                $user['days_active'] = floor((time() - strtotime($user['created_at'])) / 86400);
+            }
+
+            return $user;
+        } catch (\PDOException $e) {
+            error_log("Get profile data error: " . $e->getMessage());
+            return false;
+        }
+    }
 }

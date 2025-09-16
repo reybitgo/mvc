@@ -1,6 +1,6 @@
 {
   "name": "reybi/mvc",
-  "description": "Basic MVC Template",
+  "description": "Secure MVC Authentication System",
   "type": "project",
   "autoload": {
     "psr-4": {
@@ -13,5 +13,10 @@
       "email": "reybitgo@gmail.com"
     }
   ],
-  "require": {}
+  "require": {
+    "php": ">=7.4"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.0"
+  }
 }

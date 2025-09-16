@@ -7,6 +7,17 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+// Debug information (remove in production)
+if (isset($_GET['debug'])) {
+    echo "<h3>Debug Information:</h3>";
+    echo "Document Root: " . $_SERVER['DOCUMENT_ROOT'] . "<br>";
+    echo "Request URI: " . $_SERVER['REQUEST_URI'] . "<br>";
+    echo "Script Name: " . $_SERVER['SCRIPT_NAME'] . "<br>";
+    echo "Current Directory: " . __DIR__ . "<br>";
+    echo "Autoload file exists: " . (file_exists(__DIR__ . '/../vendor/autoload.php') ? 'Yes' : 'No') . "<br>";
+    echo "<hr>";
+}
+
 // Start session
 session_start();
 
@@ -14,6 +25,7 @@ session_start();
 require __DIR__ . '/../vendor/autoload.php';
 
 use Reybi\MVC\Controllers\UserController;
+use Reybi\MVC\Controllers\ProfileController;
 
 // Get the requested URL path
 $requestUri = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
@@ -51,6 +63,16 @@ try {
         case 'dashboard':
             $controller = new UserController();
             $controller->dashboard();
+            break;
+
+        case 'profile':
+            $controller = new UserController();
+            $controller->profile();
+            break;
+
+        case 'profile/update':
+            $controller = new ProfileController();
+            $controller->update();
             break;
 
         case 'logout':
