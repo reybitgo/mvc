@@ -178,9 +178,16 @@ class RateLimiter
                     $ip = trim(explode(',', $ip)[0]);
                 }
 
-                // Validate IP
-                if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
-                    return $ip;
+                // Validate IP (allow private ranges for local development)
+                if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                    // In development, allow all valid IPs including private ranges
+                    if (($_ENV['APP_ENV'] ?? 'production') === 'development') {
+                        return $ip;
+                    }
+                    // In production, exclude private and reserved ranges
+                    if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+                        return $ip;
+                    }
                 }
             }
         }

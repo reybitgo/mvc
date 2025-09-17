@@ -124,7 +124,7 @@ class ProfileController extends Controller
             $validator
                 ->addRule('current_password', 'required', null, 'Current password is required to change password')
                 ->addRule('new_password', 'required')
-                ->addRule('new_password', 'min_length', 8)
+                ->addRule('new_password', 'min_length', 12)
                 ->addRule('new_password', 'max_length', 128)
                 ->addRule('new_password', 'password_strength')
                 ->addRule('confirm_password', 'required', null, 'Please confirm your new password');

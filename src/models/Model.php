@@ -19,11 +19,23 @@ class Model
         $dsn = "mysql:host={$config['host']};dbname={$config['dbname']};charset={$config['charset']}";
 
         try {
-            $this->pdo = new PDO($dsn, $config['username'], $config['password']);
-            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+            // Use the configured options
+            $this->pdo = new PDO($dsn, $config['username'], $config['password'], $config['options'] ?? []);
+
+            // Apply additional security settings
+            foreach ($config['options'] ?? [] as $option => $value) {
+                $this->pdo->setAttribute($option, $value);
+            }
         } catch (PDOException $e) {
-            die("Database connection failed: " . $e->getMessage());
+            // Log the error securely without exposing sensitive information
+            error_log("Database connection failed: " . $e->getMessage());
+
+            // In production, show generic error
+            if (($_ENV['APP_ENV'] ?? 'production') === 'development') {
+                die("Database connection failed: " . $e->getMessage());
+            } else {
+                die("Database connection failed. Please try again later.");
+            }
         }
     }
 

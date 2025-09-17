@@ -116,12 +116,48 @@ class InputValidator
      */
     private function validatePasswordStrength(string $password): bool
     {
-        // At least 8 characters, 1 uppercase, 1 lowercase, 1 number, 1 special character
-        return strlen($password) >= 8 &&
-            preg_match('/[A-Z]/', $password) &&
-            preg_match('/[a-z]/', $password) &&
-            preg_match('/[0-9]/', $password) &&
-            preg_match('/[^A-Za-z0-9]/', $password);
+        // Enhanced password policy: 12+ characters, complexity requirements
+        if (strlen($password) < 12) {
+            return false;
+        }
+
+        // Check for uppercase, lowercase, number, and special character
+        $hasUpper = preg_match('/[A-Z]/', $password);
+        $hasLower = preg_match('/[a-z]/', $password);
+        $hasNumber = preg_match('/[0-9]/', $password);
+        $hasSpecial = preg_match('/[^A-Za-z0-9]/', $password);
+
+        // Require at least 3 out of 4 character types
+        $complexityCount = $hasUpper + $hasLower + $hasNumber + $hasSpecial;
+        if ($complexityCount < 3) {
+            return false;
+        }
+
+        // Check against common weak passwords
+        $commonPasswords = [
+            'password123', 'admin123456', 'qwerty123456', 'letmein123',
+            '123456789012', 'password1234', 'admin1234567', 'welcome12345',
+            'changeme123', 'default12345', 'guest1234567', 'temp12345678'
+        ];
+
+        $lowerPassword = strtolower($password);
+        foreach ($commonPasswords as $common) {
+            if ($lowerPassword === $common) {
+                return false;
+            }
+        }
+
+        // Check for repeated characters (more than 3 in a row)
+        if (preg_match('/(.)\1{3,}/', $password)) {
+            return false;
+        }
+
+        // Check for sequential characters (like 12345 or abcde)
+        if (preg_match('/(?:012|123|234|345|456|567|678|789|890|abc|bcd|cde|def|efg|fgh|ghi|hij|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz)/i', $password)) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -188,7 +224,7 @@ class InputValidator
             case 'username':
                 return "{$fieldName} must be 3-20 characters long and contain only letters, numbers, hyphens, and underscores.";
             case 'password_strength':
-                return "{$fieldName} must be at least 8 characters long and contain uppercase, lowercase, number, and special character.";
+                return "{$fieldName} must be at least 12 characters long with at least 3 of: uppercase, lowercase, number, special character. Avoid common passwords and patterns.";
             case 'no_html':
                 return "{$fieldName} cannot contain HTML tags.";
             case 'no_sql_keywords':

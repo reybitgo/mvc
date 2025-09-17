@@ -7,46 +7,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>Register - MVC Auth</title>
     <!-- CoreUI CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/@coreui/coreui@5.0.0/dist/css/coreui.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@coreui/coreui@5.0.0/dist/css/coreui.min.css" rel="stylesheet" crossorigin="anonymous">
     <!-- CoreUI Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/@coreui/icons@3.0.1/css/free.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@coreui/icons@3.0.1/css/free.min.css" rel="stylesheet" crossorigin="anonymous">
+    <!-- Bootstrap Icons fallback -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet" crossorigin="anonymous">
 
     <style>
-        .min-vh-100 {
-            min-height: 100vh !important;
-        }
-
-        .bg-body-tertiary {
-            background-color: #f8f9fa !important;
-        }
-
-        .card {
-            border: 0;
-            border-radius: 0.375rem;
-        }
-
-        .card-group {
-            margin-bottom: 0;
-        }
-
-        .card-group .card {
-            border-radius: 0.375rem !important;
-        }
-
-        .card-group .card:not(:last-child) {
-            border-top-right-radius: 0 !important;
-            border-bottom-right-radius: 0 !important;
-        }
-
-        .card-group .card:not(:first-child) {
-            border-top-left-radius: 0 !important;
-            border-bottom-left-radius: 0 !important;
-        }
-
-        .text-body-secondary {
-            color: #8a93a2 !important;
-        }
-
+        /* Minimal custom styles - let CoreUI handle the rest */
         .password-strength {
             font-size: 0.875rem;
             margin-top: 0.25rem;
@@ -62,6 +30,28 @@
 
         .password-strength.strong {
             color: #2eb85c;
+        }
+
+        /* Ensure icons display correctly */
+        .icon {
+            width: 1rem;
+            height: 1rem;
+            fill: currentColor;
+        }
+
+        .icon-xl {
+            width: 3rem;
+            height: 3rem;
+            fill: currentColor;
+        }
+
+        /* Fix any CSP-related inline style issues */
+        .bg-body-tertiary {
+            background-color: #f8f9fa;
+        }
+
+        .text-body-secondary {
+            color: #6c757d;
         }
     </style>
 </head>
@@ -185,7 +175,7 @@
                                 <!-- Password Requirements -->
                                 <div class="form-text mb-4">
                                     <small class="text-body-secondary">
-                                        Must contain: 8+ characters, uppercase, lowercase, number, and special character
+                                        Must contain: 12+ characters with at least 3 of: uppercase, lowercase, number, special character
                                     </small>
                                 </div>
 
@@ -260,7 +250,7 @@
     </svg>
 
     <!-- CoreUI JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/@coreui/coreui@5.0.0/dist/js/coreui.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@coreui/coreui@5.0.0/dist/js/coreui.bundle.min.js" crossorigin="anonymous"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -276,8 +266,9 @@
                     let strength = 0;
                     let feedback = [];
 
-                    if (password.length >= 8) strength++;
-                    else feedback.push('8+ characters');
+                    // Enhanced validation for 12+ characters
+                    if (password.length >= 12) strength++;
+                    else feedback.push('12+ characters');
 
                     if (/[A-Z]/.test(password)) strength++;
                     else feedback.push('uppercase');
@@ -291,6 +282,17 @@
                     if (/[^A-Za-z0-9]/.test(password)) strength++;
                     else feedback.push('special character');
 
+                    // Check for common patterns
+                    let hasPatterns = false;
+                    if (/(.)\1{3,}/.test(password)) {
+                        hasPatterns = true;
+                        feedback.push('no repeated characters');
+                    }
+                    if (/(?:012|123|234|345|456|567|678|789|890|abc|bcd|cde|def|efg|fgh|ghi|hij|ijk|jkl|klm|lmn|mno|nop|opq|pqr|qrs|rst|stu|tuv|uvw|vwx|wxy|xyz)/i.test(password)) {
+                        hasPatterns = true;
+                        feedback.push('no sequential patterns');
+                    }
+
                     // Clear previous content
                     strengthDiv.innerHTML = '';
 
@@ -300,10 +302,11 @@
 
                     let className, text;
 
-                    if (strength < 3) {
+                    // Require at least 3 character types + 12+ chars + no patterns
+                    if (strength < 3 || password.length < 12 || hasPatterns) {
                         className = 'weak';
                         text = '● Weak - Missing: ' + feedback.join(', ');
-                    } else if (strength < 5) {
+                    } else if (strength < 4) {
                         className = 'medium';
                         text = '● Medium - Missing: ' + feedback.join(', ');
                     } else {

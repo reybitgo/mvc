@@ -1,11 +1,19 @@
 # Enable URL rewriting
 RewriteEngine On
 
-# Handle Angular and other front-end routes - remove this if not needed
+# Allow direct access to security test file
+RewriteCond %{REQUEST_URI} ^/security-test\.php$
+RewriteRule ^security-test\.php$ security-test.php [L]
+
+# Allow direct access to files in public directory
+RewriteCond %{REQUEST_URI} ^/public/
+RewriteRule ^public/(.*)$ public/$1 [L]
+
+# Handle other requests - check if file/directory exists
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
-# Redirect all requests to public/index.php
+# Redirect all other requests to public/index.php
 RewriteRule ^(.*)$ public/index.php [QSA,L]
 
 # Optional: Redirect to HTTPS (uncomment if needed)
@@ -22,6 +30,28 @@ RewriteRule ^(.*)$ public/index.php [QSA,L]
 <Files ".env">
     Require all denied
 </Files>
+# Note: test_security.php is now in public/ directory for proper access
 <FilesMatch "\.md$">
     Require all denied
 </FilesMatch>
+<FilesMatch "\.(log|sql|bak|backup)$">
+    Require all denied
+</FilesMatch>
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# Prevent access to PHP configuration files
+<Files "*.ini">
+    Require all denied
+</Files>
+
+# Block access to version control directories
+RedirectMatch 404 /\.git
+RedirectMatch 404 /\.svn
+
+# Prevent script execution in uploads directory (if you add one)
+<Directory "uploads">
+    php_admin_flag engine off
+    AddType text/plain .php .php3 .phtml .pht
+</Directory>

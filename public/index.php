@@ -2,18 +2,45 @@
 
 // C:\laragon\www\mvc\public\index.php
 
-// Turn on error reporting for development
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+// Load application configuration
+$appConfig = require __DIR__ . '/../config/app.php';
 
-// Debug information (remove in production)
-if (isset($_GET['debug'])) {
-    echo "<h3>Debug Information:</h3>";
-    echo "Document Root: " . $_SERVER['DOCUMENT_ROOT'] . "<br>";
-    echo "Request URI: " . $_SERVER['REQUEST_URI'] . "<br>";
-    echo "Script Name: " . $_SERVER['SCRIPT_NAME'] . "<br>";
-    echo "Current Directory: " . __DIR__ . "<br>";
+// Configure error reporting based on environment
+if ($appConfig['security']['display_errors']) {
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+} else {
+    ini_set('display_errors', 0);
+    error_reporting(0);
+}
+
+// Configure secure session settings
+ini_set('session.cookie_httponly', $appConfig['session']['httponly'] ? 1 : 0);
+ini_set('session.cookie_secure', $appConfig['session']['secure'] ? 1 : 0);
+ini_set('session.cookie_samesite', $appConfig['session']['samesite']);
+ini_set('session.use_strict_mode', 1);
+ini_set('session.cookie_lifetime', $appConfig['session']['lifetime']);
+
+// Additional security headers
+header('X-Frame-Options: DENY');
+header('X-Content-Type-Options: nosniff');
+header('X-XSS-Protection: 1; mode=block');
+header('Referrer-Policy: strict-origin-when-cross-origin');
+
+// Content Security Policy (development-friendly)
+if ($appConfig['app']['env'] === 'development') {
+    header("Content-Security-Policy: default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https: https://cdn.jsdelivr.net; connect-src 'self' https://cdn.jsdelivr.net;");
+} else {
+    header("Content-Security-Policy: default-src 'self' https://cdn.jsdelivr.net; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https: https://cdn.jsdelivr.net;");
+}
+
+// Debug information only in development environment
+if (isset($_GET['debug']) && $appConfig['app']['env'] === 'development') {
+    echo "<h3>Debug Information (Development Only):</h3>";
+    echo "Environment: " . htmlspecialchars($appConfig['app']['env']) . "<br>";
+    echo "Request URI: " . htmlspecialchars($_SERVER['REQUEST_URI']) . "<br>";
+    echo "Current Directory: " . htmlspecialchars(__DIR__) . "<br>";
     echo "Autoload file exists: " . (file_exists(__DIR__ . '/../vendor/autoload.php') ? 'Yes' : 'No') . "<br>";
     echo "<hr>";
 }
@@ -83,6 +110,16 @@ try {
         case 'profile':
             $controller = new UserController();
             $controller->profile();
+            break;
+
+        case 'test-security':
+        case 'security-test':
+            // Include the security test file
+            if (file_exists(__DIR__ . '/test_security.php')) {
+                include __DIR__ . '/test_security.php';
+            } else {
+                show404();
+            }
             break;
 
         default:

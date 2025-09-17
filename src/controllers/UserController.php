@@ -32,8 +32,10 @@ class UserController extends Controller
         // Display the registration form with CSRF token
         $token = CSRFProtection::getToken();
 
-        // Debug: Log token generation
-        error_log("DEBUG: Generated CSRF token for register view: " . substr($token, 0, 10) . "...");
+        // Log token generation for development only
+        if (($_ENV['APP_ENV'] ?? 'production') === 'development') {
+            error_log("DEBUG: Generated CSRF token for register view: " . substr($token, 0, 10) . "...");
+        }
 
         $this->view('register', [
             'csrf_token' => $token
@@ -47,9 +49,11 @@ class UserController extends Controller
             return;
         }
 
-        // Debug: Check if CSRF token was received
+        // Debug: Check if CSRF token was received (development only)
         $receivedToken = $_POST['csrf_token'] ?? null;
-        error_log("DEBUG: Received CSRF token: " . ($receivedToken ? substr($receivedToken, 0, 10) . "..." : "NULL"));
+        if (($_ENV['APP_ENV'] ?? 'production') === 'development') {
+            error_log("DEBUG: Received CSRF token: " . ($receivedToken ? substr($receivedToken, 0, 10) . "..." : "NULL"));
+        }
 
         // Check rate limiting
         if (RateLimiter::isLimited('register', null, self::MAX_REGISTER_ATTEMPTS, self::RATE_LIMIT_WINDOW)) {
@@ -65,7 +69,9 @@ class UserController extends Controller
         // Validate CSRF token
         if (!CSRFProtection::validatePostToken()) {
             RateLimiter::recordAttempt('register');
-            error_log("DEBUG: CSRF validation failed for register");
+            if (($_ENV['APP_ENV'] ?? 'production') === 'development') {
+                error_log("DEBUG: CSRF validation failed for register");
+            }
             $this->view('register', [
                 'error' => 'Security token validation failed. Please try again.',
                 'csrf_token' => CSRFProtection::getToken()
@@ -95,7 +101,7 @@ class UserController extends Controller
             ->addRule('email', 'no_sql_keywords')
 
             ->addRule('password', 'required')
-            ->addRule('password', 'min_length', 8)
+            ->addRule('password', 'min_length', 12)
             ->addRule('password', 'max_length', 128)
             ->addRule('password', 'password_strength');
 
@@ -186,9 +192,11 @@ class UserController extends Controller
             return;
         }
 
-        // Debug: Check if CSRF token was received
+        // Debug: Check if CSRF token was received (development only)
         $receivedToken = $_POST['csrf_token'] ?? null;
-        error_log("DEBUG: Received CSRF token: " . ($receivedToken ? substr($receivedToken, 0, 10) . "..." : "NULL"));
+        if (($_ENV['APP_ENV'] ?? 'production') === 'development') {
+            error_log("DEBUG: Received CSRF token: " . ($receivedToken ? substr($receivedToken, 0, 10) . "..." : "NULL"));
+        }
 
         // Check rate limiting
         if (RateLimiter::isLimited('login', null, self::MAX_LOGIN_ATTEMPTS, self::RATE_LIMIT_WINDOW)) {
@@ -209,7 +217,9 @@ class UserController extends Controller
                 'ip' => $this->getClientIP()
             ]);
 
-            error_log("DEBUG: CSRF validation failed for login");
+            if (($_ENV['APP_ENV'] ?? 'production') === 'development') {
+                error_log("DEBUG: CSRF validation failed for login");
+            }
 
             $this->view('login', [
                 'error' => 'Security token validation failed. Please try again.',
