@@ -133,8 +133,7 @@ class UserController extends Controller
         }
 
         // Try to create user
-        $user = new User();
-        $result = $user->create($username, $email, $password);
+        $result = User::create($username, $email, $password);
 
         if ($result) {
             // Clear rate limiting on successful registration
@@ -268,8 +267,7 @@ class UserController extends Controller
         }
 
         // Attempt authentication
-        $user = new User();
-        $userData = $user->authenticate($username, $password);
+        $userData = User::authenticate($username, $password);
 
         if ($userData) {
             // Clear rate limiting on successful login
@@ -282,6 +280,7 @@ class UserController extends Controller
             // Set session data
             $_SESSION['user_id'] = $userData['id'];
             $_SESSION['username'] = $userData['username'];
+            $_SESSION['user_role'] = $userData['role'] ?? 'member';
             $_SESSION['login_time'] = time();
             $_SESSION['ip_address'] = $this->getClientIP();
 
@@ -347,8 +346,7 @@ class UserController extends Controller
         }
 
         // Get user data
-        $user = new User();
-        $userData = $user->getProfileData($_SESSION['user_id']);
+        $userData = User::getProfileData($_SESSION['user_id']);
 
         if (!$userData) {
             $this->logSecurityEvent('profile_access_invalid_user', [

@@ -1,2 +1,4 @@
-# Security Event Log - Started 2025-09-15 02:11:20
-{"timestamp":"2025-09-15 03:47:00","event":"csrf_validation_failed","data":{"action":"login","ip":"127.0.0.1"},"user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/140.0.0.0 Safari\/537.36","referer":"http:\/\/mvc.test\/login"}
+# Security Event Log - Reset on 2025-09-17 01:08:07
+{"timestamp":"2025-09-17 01:14:23","event":"csrf_validation_failed","data":{"action":"login","ip":"::1"},"user_agent":"curl\/8.15.0","referer":""}
+{"timestamp":"2025-09-17 01:15:03","event":"csrf_validation_failed","data":{"action":"login","ip":"::1"},"user_agent":"curl\/8.15.0","referer":""}
+{"timestamp":"2025-09-17 01:16:37","event":"user_login_success","data":{"user_id":1,"username":"admin","ip":"127.0.0.1"},"user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/140.0.0.0 Safari\/537.36","referer":"http:\/\/mvc.test\/login"}

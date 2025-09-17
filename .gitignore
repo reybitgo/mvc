@@ -1,0 +1,6 @@
+/vendor
+/logs
+security-test.php
+setup_logs.php
+.env
+/dump

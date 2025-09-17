@@ -1,9 +1,11 @@
 # Enable URL rewriting
 RewriteEngine On
 
-# Allow direct access to security test file
+# Allow direct access to security test file (fallback)
 RewriteCond %{REQUEST_URI} ^/security-test\.php$
 RewriteRule ^security-test\.php$ security-test.php [L]
+
+# Note: reset and security-test are now handled via routes in index.php
 
 # Allow direct access to files in public directory
 RewriteCond %{REQUEST_URI} ^/public/

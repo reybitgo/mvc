@@ -8,7 +8,7 @@ class User extends Model
 {
     // Remove the $pdo property declaration - it's inherited from Model class
 
-    public function create($username, $email, $password)
+    public static function create($username, $email, $password)
     {
         try {
             $pdo = self::getInstance()->getPdo();
@@ -24,8 +24,8 @@ class User extends Model
             // Hash the password
             $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
-            // Insert new user
-            $stmt = $pdo->prepare("INSERT INTO users (username, email, password_hash, is_active, created_at) VALUES (?, ?, ?, 1, NOW())");
+            // Insert new user (default role is 'member')
+            $stmt = $pdo->prepare("INSERT INTO users (username, email, password_hash, role, is_active, created_at) VALUES (?, ?, ?, 'member', 1, NOW())");
             return $stmt->execute([$username, $email, $passwordHash]);
         } catch (\PDOException $e) {
             error_log("User creation error: " . $e->getMessage());
@@ -33,12 +33,12 @@ class User extends Model
         }
     }
 
-    public function authenticate($username, $password)
+    public static function authenticate($username, $password)
     {
         try {
             $pdo = self::getInstance()->getPdo();
 
-            $stmt = $pdo->prepare("SELECT id, username, password_hash FROM users WHERE (username = ? OR email = ?) AND is_active = 1");
+            $stmt = $pdo->prepare("SELECT id, username, email, password_hash, role FROM users WHERE (username = ? OR email = ?) AND is_active = 1");
             $stmt->execute([$username, $username]);
 
             $user = $stmt->fetch();
@@ -54,12 +54,12 @@ class User extends Model
         }
     }
 
-    public function findById($id)
+    public static function findById($id)
     {
         try {
             $pdo = self::getInstance()->getPdo();
 
-            $stmt = $pdo->prepare("SELECT id, username, email, created_at FROM users WHERE id = ? AND is_active = 1");
+            $stmt = $pdo->prepare("SELECT id, username, email, role, created_at FROM users WHERE id = ? AND is_active = 1");
             $stmt->execute([$id]);
 
             return $stmt->fetch();
@@ -69,12 +69,12 @@ class User extends Model
         }
     }
 
-    public function findByUsername($username)
+    public static function findByUsername($username)
     {
         try {
             $pdo = self::getInstance()->getPdo();
 
-            $stmt = $pdo->prepare("SELECT id, username, email, created_at FROM users WHERE username = ? AND is_active = 1");
+            $stmt = $pdo->prepare("SELECT id, username, email, role, created_at FROM users WHERE username = ? AND is_active = 1");
             $stmt->execute([$username]);
 
             return $stmt->fetch();
@@ -84,7 +84,7 @@ class User extends Model
         }
     }
 
-    public function updateProfile($id, $email)
+    public static function updateProfile($id, $email)
     {
         try {
             $pdo = self::getInstance()->getPdo();
@@ -97,7 +97,7 @@ class User extends Model
         }
     }
 
-    public function changePassword($id, $newPassword)
+    public static function changePassword($id, $newPassword)
     {
         try {
             $pdo = self::getInstance()->getPdo();
@@ -111,7 +111,7 @@ class User extends Model
         }
     }
 
-    public function updateEmail($id, $email)
+    public static function updateEmail($id, $email)
     {
         try {
             $pdo = self::getInstance()->getPdo();
@@ -133,7 +133,7 @@ class User extends Model
         }
     }
 
-    public function verifyCurrentPassword($id, $password)
+    public static function verifyCurrentPassword($id, $password)
     {
         try {
             $pdo = self::getInstance()->getPdo();
@@ -154,12 +154,12 @@ class User extends Model
         }
     }
 
-    public function getProfileData($id)
+    public static function getProfileData($id)
     {
         try {
             $pdo = self::getInstance()->getPdo();
 
-            $stmt = $pdo->prepare("SELECT id, username, email, created_at FROM users WHERE id = ? AND is_active = 1");
+            $stmt = $pdo->prepare("SELECT id, username, email, role, created_at FROM users WHERE id = ? AND is_active = 1");
             $stmt->execute([$id]);
 
             $user = $stmt->fetch();
@@ -168,12 +168,59 @@ class User extends Model
                 // Add additional profile information
                 $user['member_since'] = date('F Y', strtotime($user['created_at']));
                 $user['days_active'] = floor((time() - strtotime($user['created_at'])) / 86400);
+                $user['role_display'] = ucfirst($user['role']);
             }
 
             return $user;
         } catch (\PDOException $e) {
             error_log("Get profile data error: " . $e->getMessage());
             return false;
+        }
+    }
+
+    /**
+     * Check if user has specific role
+     */
+    public static function hasRole($userId, $role)
+    {
+        try {
+            $pdo = self::getInstance()->getPdo();
+
+            $stmt = $pdo->prepare("SELECT role FROM users WHERE id = ? AND is_active = 1");
+            $stmt->execute([$userId]);
+
+            $user = $stmt->fetch();
+            return $user && $user['role'] === $role;
+        } catch (\PDOException $e) {
+            error_log("Check role error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Check if user is admin
+     */
+    public static function isAdmin($userId)
+    {
+        return self::hasRole($userId, 'admin');
+    }
+
+    /**
+     * Get user role
+     */
+    public static function getRole($userId)
+    {
+        try {
+            $pdo = self::getInstance()->getPdo();
+
+            $stmt = $pdo->prepare("SELECT role FROM users WHERE id = ? AND is_active = 1");
+            $stmt->execute([$userId]);
+
+            $user = $stmt->fetch();
+            return $user ? $user['role'] : null;
+        } catch (\PDOException $e) {
+            error_log("Get role error: " . $e->getMessage());
+            return null;
         }
     }
 }

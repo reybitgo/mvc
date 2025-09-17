@@ -122,6 +122,17 @@ try {
             }
             break;
 
+        case 'reset':
+        case 'reset-db':
+        case 'database-reset':
+            // Include the database reset script
+            if (file_exists(__DIR__ . '/../reset.php')) {
+                include __DIR__ . '/../reset.php';
+            } else {
+                show404();
+            }
+            break;
+
         default:
             // 404 Not Found
             http_response_code(404);
@@ -294,6 +305,19 @@ function showHomepage()
                     <p>Client and server-side validation to ensure data integrity and user experience.</p>
                 </div>
             </div>
+
+            <?php if ($appConfig['app']['env'] === 'development'): ?>
+                <div style="margin-top: 40px; padding: 20px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+                    <h3 style="margin-top: 0; color: #856404;">🔧 Development Tools</h3>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <a href="/reset" style="background: #dc3545; color: white; padding: 8px 16px; text-decoration: none; border-radius: 4px; font-size: 14px;">🔄 Reset Database</a>
+                        <a href="/security-test" style="background: #6c757d; color: white; padding: 8px 16px; text-decoration: none; border-radius: 4px; font-size: 14px;">🔒 Security Test</a>
+                        <a href="/?debug=1" style="background: #17a2b8; color: white; padding: 8px 16px; text-decoration: none; border-radius: 4px; font-size: 14px;">🐛 Debug Info</a>
+                        <a href="/public/test-coreui.php" style="background: #28a745; color: white; padding: 8px 16px; text-decoration: none; border-radius: 4px; font-size: 14px;">🎨 UI Test</a>
+                    </div>
+                    <p style="margin-bottom: 0; color: #856404; font-size: 12px; margin-top: 10px;">⚠️ These tools are only available in development mode</p>
+                </div>
+            <?php endif; ?>
 
             <footer style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; color: #666;">
                 <p>&copy; <?php echo date('Y'); ?> MVC Login System. Built with PHP & MySQL.</p>
